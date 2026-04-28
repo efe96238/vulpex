@@ -42,6 +42,31 @@ class Model:
     for p in self.parameters():
       p.zero_grad()
 
+  def predict(self, X, batch_size=None):
+    X = np.asarray(X)
+    was_training = self.training
+    self.eval()
+
+    if batch_size is None:
+      out = self.forward(X)
+    else:
+      from .dataloader import DataLoader
+      loader = DataLoader(X, batch_size=batch_size, shuffle=False)
+      outputs = []
+      for (X_batch,) in loader:
+        outputs.append(self.forward(X_batch))
+      out = np.concatenate(outputs, axis=0)
+
+    if was_training:
+      self.train()
+
+    return out
+
+  def evaluate(self, X, y, loss, batch_size=None):
+    y = np.asarray(y)
+    preds = self.predict(X, batch_size)
+    return loss.forward(y, preds)
+
   def _build_manifest(self):
     params = self.parameters()
 
