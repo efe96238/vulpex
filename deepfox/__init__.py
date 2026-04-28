@@ -25,6 +25,8 @@ from .parameter import Parameter
 
 from .utils import argmax, seed, train_test_val_split
 
+from .dataloader import DataLoader
+
 __all__ = [
   "Model",
   "Linear", "Sequential",
@@ -40,5 +42,6 @@ __all__ = [
   "HuberLoss", "NLLLoss", "HingeLoss", "KLDivergence", "CosineEmbeddingLoss", "SmoothL1Loss",
   "Adam", "AdamW", "SGD", "MomentumSGD", "RMSProp",
   "Parameter",
-  "argmax", "seed", "train_test_val_split"
+  "argmax", "seed", "train_test_val_split",
+  "DataLoader"
 ]
