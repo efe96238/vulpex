@@ -1,6 +1,9 @@
 import json
 import zipfile
 import numpy as np
+import time
+from .dataloader import DataLoader
+from .history import History
 
 class Model:
   def __init__(self, *blocks):
@@ -66,6 +69,48 @@ class Model:
     y = np.asarray(y)
     preds = self.predict(X, batch_size)
     return loss.forward(y, preds)
+  
+  def fit(self, X, y, epochs=10, batch_size=32, optimizer=None, loss=None, validation_data=None, verbose=True):
+    if optimizer is None:
+      raise ValueError("optimizer cannot be None.")
+    if loss is None:
+      raise ValueError("loss cannot be None.")
+
+    loader = DataLoader(X, y, batch_size=batch_size, shuffle=True)
+    history = History()
+
+    for epoch in range(epochs):
+      start = time.time()
+      self.train()
+      batch_losses = []
+
+      for X_batch, y_batch in loader:
+        self.zero_grad()
+        pred = self.forward(X_batch)
+        batch_loss = loss.forward(y_batch, pred)
+        grad = loss.backward()
+        self.backward(grad)
+        optimizer.step(self.parameters())
+        batch_losses.append(batch_loss)
+
+      epoch_loss = np.mean(batch_losses)
+      history.record("loss", float(epoch_loss))
+
+      if validation_data is not None:
+        X_val, y_val = validation_data
+        val_loss = self.evaluate(X_val, y_val, loss)
+        history.record("val_loss", float(val_loss))
+      
+      elapsed = time.time() - start
+
+      if verbose:
+        msg = f"Epoch {epoch + 1}/{epochs} | Training Loss: {epoch_loss:.4f}"
+        if validation_data is not None:
+          msg += f" | Validation Loss: {val_loss:.4f}"
+        msg += f" | Duration: {elapsed:.2f}s"
+        print(msg)
+
+    return history
 
   def _build_manifest(self):
     params = self.parameters()

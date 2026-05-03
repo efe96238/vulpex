@@ -27,6 +27,8 @@ from .utils import argmax, seed, train_test_val_split
 
 from .dataloader import DataLoader
 
+from .history import History
+
 __all__ = [
   "Model",
   "Linear", "Sequential",
@@ -43,5 +45,5 @@ __all__ = [
   "Adam", "AdamW", "SGD", "MomentumSGD", "RMSProp",
   "Parameter",
   "argmax", "seed", "train_test_val_split",
-  "DataLoader"
+  "DataLoader", "History"
 ]
