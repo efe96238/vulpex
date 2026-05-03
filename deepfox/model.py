@@ -76,7 +76,11 @@ class Model:
     if loss is None:
       raise ValueError("loss cannot be None.")
 
-    loader = DataLoader(X, y, batch_size=batch_size, shuffle=True)
+    if batch_size is not None:
+      loader = DataLoader(X, y, batch_size=batch_size, shuffle=True)
+    else:
+      X, y = np.asarray(X), np.asarray(y)
+      loader = [(X, y)]
     history = History()
 
     for epoch in range(epochs):
