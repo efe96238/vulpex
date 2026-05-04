@@ -70,7 +70,7 @@ class Model:
     preds = self.predict(X, batch_size)
     return loss.forward(y, preds)
   
-  def fit(self, X, y, epochs=10, batch_size=32, optimizer=None, loss=None, validation_data=None, verbose=True):
+  def fit(self, X, y, epochs=10, batch_size=32, optimizer=None, loss=None, validation_data=None, scheduler=None, verbose=True):
     if optimizer is None:
       raise ValueError("optimizer cannot be None.")
     if loss is None:
@@ -104,6 +104,9 @@ class Model:
         X_val, y_val = validation_data
         val_loss = self.evaluate(X_val, y_val, loss)
         history.record("val_loss", float(val_loss))
+
+      if scheduler is not None:
+        scheduler.step(epoch_loss)
       
       elapsed = time.time() - start
 

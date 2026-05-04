@@ -29,6 +29,8 @@ from .dataloader import DataLoader
 
 from .history import History
 
+from .schedulers import StepLR, ReduceOnPlateau
+
 __all__ = [
   "Model",
   "Linear", "Sequential",
@@ -45,5 +47,5 @@ __all__ = [
   "Adam", "AdamW", "SGD", "MomentumSGD", "RMSProp",
   "Parameter",
   "argmax", "seed", "train_test_val_split",
-  "DataLoader", "History"
+  "DataLoader", "History", "StepLR", "ReduceOnPlateau"
 ]
