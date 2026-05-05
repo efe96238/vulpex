@@ -7,3 +7,5 @@ from .adaptiveavgpool import AdaptiveAvgPool1D, AdaptiveAvgPool2D, AdaptiveAvgPo
 from .batchnorm import BatchNorm1D, BatchNorm2D, BatchNorm3D
 from .dropout import Dropout
 from .flatten import Flatten
+from .embedding import Embedding
+from .layernorm import LayerNorm
