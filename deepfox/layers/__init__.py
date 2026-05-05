@@ -9,3 +9,4 @@ from .dropout import Dropout
 from .flatten import Flatten
 from .embedding import Embedding
 from .layernorm import LayerNorm
+from .zeropad import ZeroPad1D, ZeroPad2D, ZeroPad3D

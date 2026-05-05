@@ -7,7 +7,8 @@ from .layers import (
   AvgPool1D, AvgPool2D, AvgPool3D,
   AdaptiveAvgPool1D, AdaptiveAvgPool2D, AdaptiveAvgPool3D,
   BatchNorm1D, BatchNorm2D, BatchNorm3D,
-  Dropout, Flatten, Embedding, LayerNorm
+  Dropout, Flatten, Embedding, LayerNorm,
+  ZeroPad1D, ZeroPad2D, ZeroPad3D
 )
 
 from .activations import (
@@ -47,6 +48,7 @@ __all__ = [
   "AdaptiveAvgPool1D", "AdaptiveAvgPool2D", "AdaptiveAvgPool3D",
   "BatchNorm1D", "BatchNorm2D", "BatchNorm3D",
   "Dropout", "Flatten", "Embedding", "LayerNorm",
+  "ZeroPad1D", "ZeroPad2D", "ZeroPad3D",
   "Sigmoid", "Tanh", "Softmax", "LogSoftmax",
   "ReLU", "LeakyReLU", "GeLU", "SiLU", "ELU", "PReLU", "SELU",
   "MSE", "MAE", "BCE", "BCEWithLogits", "CrossEntropy", "CrossEntropyWithLogits",
