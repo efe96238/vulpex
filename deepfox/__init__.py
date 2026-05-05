@@ -33,6 +33,8 @@ from .schedulers import StepLR, ReduceOnPlateau
 
 from .callbacks import EarlyStopping
 
+from .initializers import xavier_uniform, xavier_normal, he_uniform, he_normal, zeros, ones
+
 __all__ = [
   "Model",
   "Linear", "Sequential",
@@ -49,5 +51,6 @@ __all__ = [
   "Adam", "AdamW", "SGD", "MomentumSGD", "RMSProp",
   "Parameter",
   "argmax", "seed", "train_test_val_split",
-  "DataLoader", "History", "StepLR", "ReduceOnPlateau", "EarlyStopping"
+  "DataLoader", "History", "StepLR", "ReduceOnPlateau", "EarlyStopping",
+  "xavier_uniform", "xavier_normal", "he_uniform", "he_normal", "zeros", "ones"
 ]
