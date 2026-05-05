@@ -127,6 +127,36 @@ class Model:
         print(msg)
 
     return history
+  
+  def count_params(self):
+    return sum(p.data.size for p in self.parameters())
+  
+  def summary(self, input_shape):
+    x = np.zeros((1,) + input_shape)
+    
+    rows = []
+    for layer in self._get_all_layers():
+      x = layer.forward(x)
+      name = layer.__class__.__name__
+      shape = x.shape
+      params = sum(p.data.size for p in layer.parameters())
+      rows.append((name, shape, params))
+    
+    print(f"{'Layer':<25}{'Output Shape':<25}{'Params':<10}")
+    print("─" * 60)
+    for name, shape, params in rows:
+      print(f"{name:<25}{str(shape):<25}{params:<10}")
+    print("═" * 60)
+    print(f"Total params: {self.count_params():,}")
+
+  def _get_all_layers(self):
+      layers = []
+      for block in self.blocks:
+        if hasattr(block, 'layers'):
+          layers.extend(block.layers)
+        else:
+          layers.append(block)
+      return layers
 
   def _build_manifest(self):
     params = self.parameters()
