@@ -70,7 +70,7 @@ class Model:
     preds = self.predict(X, batch_size)
     return loss.forward(y, preds)
   
-  def fit(self, X, y, epochs=10, batch_size=32, optimizer=None, loss=None, validation_data=None, scheduler=None, verbose=True):
+  def fit(self, X, y, epochs=10, batch_size=32, optimizer=None, loss=None, validation_data=None, scheduler=None, early_stopping=None, verbose=True):
     if optimizer is None:
       raise ValueError("optimizer cannot be None.")
     if loss is None:
@@ -107,6 +107,15 @@ class Model:
 
       if scheduler is not None:
         scheduler.step(epoch_loss)
+
+      if early_stopping is not None:
+        monitor = val_loss if validation_data is not None else epoch_loss
+        if early_stopping.step(monitor, self):
+          early_stopping.stopped_epoch = epoch + 1
+          early_stopping.restore(self)
+          if verbose:
+            print(f"Early stopping at epoch {epoch + 1}. Restoring best weights.")
+          break
       
       elapsed = time.time() - start
 
