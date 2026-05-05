@@ -10,7 +10,10 @@ from .layers import (
   Dropout, Flatten
 )
 
-from .activations import Sigmoid, Tanh, Softmax, LogSoftmax, ReLU, LeakyReLU, GeLU, SiLU, ELU, PReLU, SELU
+from .activations import (
+  Sigmoid, Tanh, Softmax, LogSoftmax, 
+  ReLU, LeakyReLU, GeLU, SiLU, ELU, PReLU, SELU
+)
 
 from .loss_functions import (
   MSE, MAE, BCE, 
@@ -23,7 +26,7 @@ from .optimizers import Adam, AdamW, SGD, MomentumSGD, RMSProp
 
 from .parameter import Parameter
 
-from .utils import argmax, seed, train_test_val_split
+from .utils import argmax, seed, train_test_val_split, clip_grad_norm, clip_grad_value
 
 from .dataloader import DataLoader
 
@@ -50,7 +53,7 @@ __all__ = [
   "HuberLoss", "NLLLoss", "HingeLoss", "KLDivergence", "CosineEmbeddingLoss", "SmoothL1Loss",
   "Adam", "AdamW", "SGD", "MomentumSGD", "RMSProp",
   "Parameter",
-  "argmax", "seed", "train_test_val_split",
+  "argmax", "seed", "train_test_val_split", "clip_grad_norm", "clip_grad_value",
   "DataLoader", "History", "StepLR", "ReduceOnPlateau", "EarlyStopping",
   "xavier_uniform", "xavier_normal", "he_uniform", "he_normal", "zeros", "ones"
 ]

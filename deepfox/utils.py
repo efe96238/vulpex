@@ -107,3 +107,14 @@ def train_test_val_split(X, y, test_size=0.2, val_size=None, shuffle=True, seed=
       return X[train_idx], X[test_idx], X[val_idx], y[train_idx], y[test_idx], y[val_idx]
     else:
       return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
+    
+def clip_grad_norm(parameters, max_norm):
+  total_norm = np.sqrt(sum(np.sum(p.grad ** 2) for p in parameters))
+  if total_norm > max_norm:
+    scale = max_norm / total_norm
+    for p in parameters:
+      p.grad *= scale
+
+def clip_grad_value(parameters, clip_value):
+  for p in parameters:
+    p.grad = np.clip(p.grad, -clip_value, clip_value)
