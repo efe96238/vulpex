@@ -4,3 +4,5 @@ mdfiles/
 models/
 pyproject.toml
 *.egg-info/
+testscripts/
+testsets/
