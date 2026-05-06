@@ -10,6 +10,9 @@ class DataLoader:
     self.seed = seed
     self.rng = np.random.default_rng(seed)
 
+    if not isinstance(batch_size, int) or batch_size < 1:
+      raise ValueError(f"batch_size must be a positive integer, got {batch_size}.")
+
     if self.y is not None and self.X.shape[0] != self.y.shape[0]:
       raise ValueError("X and y must have the same number of samples.")
 

@@ -10,6 +10,9 @@ class MSE:
     y = np.asarray(y)
     y_pred = np.asarray(y_pred)
 
+    if y.shape != y_pred.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs y_pred {y_pred.shape}.")
+
     self.y = y
     self.y_pred = y_pred
 
@@ -42,6 +45,9 @@ class MAE:
     y = np.asarray(y)
     y_pred = np.asarray(y_pred)
 
+    if y.shape != y_pred.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs y_pred {y_pred.shape}.")
+
     self.y = y
     self.y_pred = y_pred
 
@@ -73,6 +79,9 @@ class BCE:
   def forward(self, y, y_pred):
     y = np.asarray(y)
     y_pred = np.asarray(y_pred)
+
+    if y.shape != y_pred.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs y_pred {y_pred.shape}.")
 
     eps = 1e-15
     y_pred = np.clip(y_pred, eps, 1.0 - eps)
@@ -109,6 +118,9 @@ class BCEWithLogits:
     y = np.asarray(y)
     logits = np.asarray(logits)
 
+    if y.shape != logits.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs logits {logits.shape}.")
+
     self.y = y
 
     self.sigmoid = np.where(logits >= 0, 1 / (1 + np.exp(-logits)), np.exp(logits) / (1 + np.exp(logits)))
@@ -142,6 +154,12 @@ class CrossEntropy:
   def forward(self, y, y_pred):
     y = np.asarray(y)
     y_pred = np.asarray(y_pred)
+
+    if y.shape != y_pred.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs y_pred {y_pred.shape}.")
+
+    if y.ndim != 2:
+      raise ValueError(f"CrossEntropy expects 2D input (batch_size, num_classes), got {y.ndim}D.")
 
     eps = 1e-15
     y_pred = np.clip(y_pred, eps, 1.0 - eps)
@@ -187,6 +205,12 @@ class CrossEntropyWithLogits:
   def forward(self, y, logits):
     y = np.asarray(y)
     logits = np.asarray(logits)
+
+    if y.shape != logits.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs logits {logits.shape}.")
+
+    if y.ndim != 2:
+      raise ValueError(f"CrossEntropyWithLogits expects 2D input (batch_size, num_classes), got {y.ndim}D.")
 
     self.y = y
 
@@ -236,6 +260,9 @@ class HuberLoss:
     y = np.asarray(y)
     y_pred = np.asarray(y_pred)
 
+    if y.shape != y_pred.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs y_pred {y_pred.shape}.")
+
     self.y = y
     self.y_pred = y_pred
 
@@ -270,6 +297,12 @@ class NLLLoss:
     y = np.asarray(y)
     log_probs = np.asarray(log_probs)
 
+    if y.shape != log_probs.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs log_probs {log_probs.shape}.")
+
+    if y.ndim != 2:
+      raise ValueError(f"NLLLoss expects 2D input (batch_size, num_classes), got {y.ndim}D.")
+
     self.y = y
 
     losses = -np.sum(y * log_probs, axis=1)
@@ -302,6 +335,9 @@ class HingeLoss:
     y = np.asarray(y)
     y_pred = np.asarray(y_pred)
 
+    if y.shape != y_pred.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs y_pred {y_pred.shape}.")
+
     self.y = y
     self.y_pred = y_pred
 
@@ -333,6 +369,12 @@ class KLDivergence:
   def forward(self, y, log_probs):
     y = np.asarray(y)
     log_probs = np.asarray(log_probs)
+
+    if y.shape != log_probs.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs log_probs {log_probs.shape}.")
+
+    if y.ndim != 2:
+      raise ValueError(f"KLDivergence expects 2D input (batch_size, num_classes), got {y.ndim}D.")
 
     eps = 1e-15
     y = np.clip(y, eps, 1.0 - eps)
@@ -370,6 +412,12 @@ class CosineEmbeddingLoss:
     y = np.asarray(y, dtype=np.float64)
     x1 = np.asarray(x1)
     x2 = np.asarray(x2)
+
+    if x1.shape != x2.shape:
+      raise ValueError(f"Shape mismatch: x1 {x1.shape} vs x2 {x2.shape}.")
+
+    if x1.ndim != 2:
+      raise ValueError(f"CosineEmbeddingLoss expects 2D inputs (batch_size, features), got {x1.ndim}D.")
 
     self.y = y
     self.x1 = x1
@@ -423,6 +471,9 @@ class SmoothL1Loss:
   def forward(self, y, y_pred):
     y = np.asarray(y)
     y_pred = np.asarray(y_pred)
+
+    if y.shape != y_pred.shape:
+      raise ValueError(f"Shape mismatch: y {y.shape} vs y_pred {y_pred.shape}.")
 
     self.y = y
     self.y_pred = y_pred
