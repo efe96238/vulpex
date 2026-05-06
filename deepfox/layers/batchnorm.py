@@ -17,6 +17,13 @@ class BatchNorm1D(Layer):
     x = np.asarray(x)
     self.input_shape = x.shape
 
+    if x.ndim not in (2, 3):
+      raise ValueError(f"BatchNorm1D expects 2D (batch, features) or 3D (batch, channels, length) input, got {x.ndim}D.")
+
+    features = x.shape[1]
+    if features != self.num_features:
+      raise ValueError(f"Expected {self.num_features} features/channels, got {features}.")
+
     if x.ndim == 3:
       batch, channels, length = x.shape
       x = x.transpose(0, 2, 1).reshape(-1, channels)
@@ -91,6 +98,13 @@ class BatchNorm2D(Layer):
     x = np.asarray(x)
     self.input_shape = x.shape
 
+    if x.ndim != 4:
+      raise ValueError(f"BatchNorm2D expects 4D input (batch, channels, height, width), got {x.ndim}D.")
+
+    channels = x.shape[1]
+    if channels != self.num_features:
+      raise ValueError(f"Expected {self.num_features} channels, got {channels}.")
+
     if x.ndim == 4:
       batch, channels, height, width = x.shape
       x = x.transpose(0, 2, 3, 1).reshape(-1, channels)
@@ -164,6 +178,13 @@ class BatchNorm3D(Layer):
   def forward(self, x):
     x = np.asarray(x)
     self.input_shape = x.shape
+
+    if x.ndim != 5:
+      raise ValueError(f"BatchNorm3D expects 5D input (batch, channels, depth, height, width), got {x.ndim}D.")
+
+    channels = x.shape[1]
+    if channels != self.num_features:
+      raise ValueError(f"Expected {self.num_features} channels, got {channels}.")
 
     if x.ndim == 5:
       batch, channels, depth, height, width = x.shape

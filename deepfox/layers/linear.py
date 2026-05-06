@@ -21,6 +21,13 @@ class Linear(Layer):
 
   def forward(self, x):
     self.x = np.asarray(x)
+
+    if self.x.ndim < 2:
+      raise ValueError(f"Linear expects at least 2D input (batch_size, features), got {self.x.ndim}D.")
+
+    if self.x.shape[-1] != self.in_features:
+      raise ValueError(f"Expected input features {self.in_features}, got {self.x.shape[-1]}.")
+
     out = self.x @ self.weights.data
     if self.bias is not None:
       out += self.bias.data

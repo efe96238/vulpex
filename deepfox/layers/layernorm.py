@@ -17,6 +17,12 @@ class LayerNorm(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim < 2:
+      raise ValueError(f"LayerNorm expects at least 2D input, got {x.ndim}D.")
+
+    if x.shape[-len(self.normalized_shape):] != self.normalized_shape:
+      raise ValueError(f"Expected last dimensions to be {self.normalized_shape}, got {x.shape[-len(self.normalized_shape):]}.") 
+
     axes = tuple(range(-len(self.normalized_shape), 0))
 
     mean = np.mean(x, axis=axes, keepdims=True)

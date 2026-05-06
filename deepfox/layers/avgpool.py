@@ -11,7 +11,13 @@ class AvgPool1D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 3:
+      raise ValueError(f"AvgPool1D expects 3D input (batch, channels, length), got {x.ndim}D.")
+
     batch_size, channels, input_len = x.shape
+
+    if input_len + 2 * self.padding < self.kernel_size:
+      raise ValueError(f"Input length ({input_len}) + padding ({self.padding}) is smaller than kernel_size ({self.kernel_size}).")
 
     if self.padding > 0:
       x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding)), constant_values=0)
@@ -82,7 +88,13 @@ class AvgPool2D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 4:
+      raise ValueError(f"AvgPool2D expects 4D input (batch, channels, height, width), got {x.ndim}D.")
+
     batch_size, channels, height, width = x.shape
+
+    if height + 2 * self.padding < self.kernel_size or width + 2 * self.padding < self.kernel_size:
+      raise ValueError(f"Input spatial dims ({height}x{width}) + padding ({self.padding}) are smaller than kernel_size ({self.kernel_size}).")
 
     if self.padding > 0:
       x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding), (self.padding, self.padding)), constant_values=0)
@@ -162,7 +174,13 @@ class AvgPool3D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 5:
+      raise ValueError(f"AvgPool3D expects 5D input (batch, channels, depth, height, width), got {x.ndim}D.")
+
     batch_size, channels, depth, height, width = x.shape
+
+    if depth + 2 * self.padding < self.kernel_size or height + 2 * self.padding < self.kernel_size or width + 2 * self.padding < self.kernel_size:
+      raise ValueError(f"Input spatial dims ({depth}x{height}x{width}) + padding ({self.padding}) are smaller than kernel_size ({self.kernel_size}).")
 
     if self.padding > 0:
       x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding), (self.padding, self.padding), (self.padding, self.padding)), constant_values=0)

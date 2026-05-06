@@ -11,6 +11,9 @@ class ZeroPad1D(Layer):
   def forward(self, x):
     x = np.asarray(x)
 
+    if x.ndim != 3:
+      raise ValueError(f"ZeroPad1D expects 3D input (batch, channels, length), got {x.ndim}D.")
+
     return np.pad(x, ((0, 0), (0, 0), (self.padding[0], self.padding[1])))
   
   def backward(self, grad):
@@ -44,6 +47,10 @@ class ZeroPad2D(Layer):
 
   def forward(self, x):
     x = np.asarray(x)
+
+    if x.ndim != 4:
+      raise ValueError(f"ZeroPad2D expects 4D input (batch, channels, height, width), got {x.ndim}D.")
+
     return np.pad(x, ((0, 0), (0, 0), self.padding[0], self.padding[1]))
 
   def backward(self, grad):
@@ -78,6 +85,10 @@ class ZeroPad3D(Layer):
 
   def forward(self, x):
     x = np.asarray(x)
+
+    if x.ndim != 5:
+      raise ValueError(f"ZeroPad3D expects 5D input (batch, channels, depth, height, width), got {x.ndim}D.")
+
     return np.pad(x, ((0, 0), (0, 0), self.padding[0], self.padding[1], self.padding[2]))
 
   def backward(self, grad):

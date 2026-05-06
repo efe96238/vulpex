@@ -15,6 +15,13 @@ class Embedding(Layer):
   def forward(self, x):
     x = np.asarray(x)
     self.x = x
+
+    if not np.issubdtype(x.dtype, np.integer):
+      raise ValueError(f"Embedding expects integer indices, got dtype {x.dtype}.")
+
+    if np.any(x < 0) or np.any(x >= self.num_embeddings):
+      raise ValueError(f"Index out of range. Expected indices in [0, {self.num_embeddings}), got min={x.min()}, max={x.max()}.")
+
     return self.weights.data[x]
   
   def backward(self, grad):

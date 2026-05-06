@@ -9,7 +9,13 @@ class AdaptiveAvgPool1D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 3:
+      raise ValueError(f"AdaptiveAvgPool1D expects 3D input (batch, channels, length), got {x.ndim}D.")
+
     batch_size, channels, length = x.shape
+
+    if length < self.output_size:
+      raise ValueError(f"Input length ({length}) must be >= output_size ({self.output_size}).")
 
     out = np.zeros((batch_size, channels, self.output_size))
 
@@ -63,7 +69,13 @@ class AdaptiveAvgPool2D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 4:
+      raise ValueError(f"AdaptiveAvgPool2D expects 4D input (batch, channels, height, width), got {x.ndim}D.")
+
     batch_size, channels, height, width = x.shape
+
+    if height < self.output_size or width < self.output_size:
+      raise ValueError(f"Input spatial dims ({height}x{width}) must be >= output_size ({self.output_size}).")
 
     out = np.zeros((batch_size, channels, self.output_size, self.output_size))
 
@@ -126,7 +138,13 @@ class AdaptiveAvgPool3D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 5:
+      raise ValueError(f"AdaptiveAvgPool3D expects 5D input (batch, channels, depth, height, width), got {x.ndim}D.")
+
     batch_size, channels, depth, height, width = x.shape
+
+    if depth < self.output_size or height < self.output_size or width < self.output_size:
+      raise ValueError(f"Input spatial dims ({depth}x{height}x{width}) must be >= output_size ({self.output_size}).")
 
     out = np.zeros((batch_size, channels, self.output_size, self.output_size, self.output_size))
 

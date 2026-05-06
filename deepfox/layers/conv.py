@@ -27,10 +27,17 @@ class Conv1D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 3:
+      raise ValueError(f"Conv1D expects 3D input (batch_size, channels, length), got {x.ndim}D.")
+
     batch_size, in_channels, input_len = x.shape
 
     if in_channels != self.in_channels:
-      raise ValueError(f"Expected {self.in_channels} channels, got {in_channels}")
+      raise ValueError(f"Expected {self.in_channels} input channels, got {in_channels}.")
+
+    effective_len = input_len + 2 * self.padding
+    if effective_len < self.kernel_size:
+      raise ValueError(f"Input length ({input_len}) + padding ({self.padding}) is smaller than kernel_size ({self.kernel_size}).")
 
     if self.padding > 0:
       x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding)))
@@ -137,10 +144,18 @@ class Conv2D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 4:
+      raise ValueError(f"Conv2D expects 4D input (batch_size, channels, height, width), got {x.ndim}D.")
+
     batch_size, in_channels, height, width = x.shape
 
     if in_channels != self.in_channels:
-      raise ValueError(f"Expected {self.in_channels} channels, got {in_channels}")
+      raise ValueError(f"Expected {self.in_channels} input channels, got {in_channels}.")
+
+    effective_h = height + 2 * self.padding
+    effective_w = width + 2 * self.padding
+    if effective_h < self.kernel_size or effective_w < self.kernel_size:
+      raise ValueError(f"Input spatial dims ({height}x{width}) + padding ({self.padding}) are smaller than kernel_size ({self.kernel_size}).")
 
     if self.padding > 0:
       x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding), (self.padding, self.padding)))
@@ -256,10 +271,19 @@ class Conv3D(Layer):
     x = np.asarray(x)
     self.x = x
 
+    if x.ndim != 5:
+      raise ValueError(f"Conv3D expects 5D input (batch_size, channels, depth, height, width), got {x.ndim}D.")
+
     batch_size, in_channels, depth, height, width = x.shape
 
     if in_channels != self.in_channels:
-      raise ValueError(f"Expected {self.in_channels} channels, got {in_channels}")
+      raise ValueError(f"Expected {self.in_channels} input channels, got {in_channels}.")
+
+    effective_d = depth + 2 * self.padding
+    effective_h = height + 2 * self.padding
+    effective_w = width + 2 * self.padding
+    if effective_d < self.kernel_size or effective_h < self.kernel_size or effective_w < self.kernel_size:
+      raise ValueError(f"Input spatial dims ({depth}x{height}x{width}) + padding ({self.padding}) are smaller than kernel_size ({self.kernel_size}).")
 
     if self.padding > 0:
       x_padded = np.pad(x, ((0, 0), (0, 0), (self.padding, self.padding), (self.padding, self.padding), (self.padding, self.padding)))

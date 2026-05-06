@@ -6,6 +6,8 @@ from ..utils import get_rng
 
 class Dropout(Layer):
   def __init__(self, p=0.5):
+    if not 0 <= p < 1:
+      raise ValueError(f"Dropout probability must be in [0, 1), got {p}.")
     self.p = p
   
   def forward(self, x):
