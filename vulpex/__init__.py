@@ -1,3 +1,5 @@
+__version__ = "0.1.0"
+
 from .model import Model
 
 from .layers import (
@@ -42,6 +44,7 @@ from .callbacks import EarlyStopping
 from .initializers import xavier_uniform, xavier_normal, he_uniform, he_normal, zeros, ones
 
 __all__ = [
+  "__version__",
   "Model",
   "Linear", "Sequential",
   "Conv1D", "Conv2D", "Conv3D",
