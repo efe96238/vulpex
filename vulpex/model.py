@@ -162,7 +162,7 @@ class Model:
     params = self.parameters()
 
     manifest = {
-      "format": "DeepFox",
+      "format": "Vulpex",
       "version": 1,
       "blocks": [block.get_config() for block in self.blocks],
       "parameters": []
@@ -178,8 +178,8 @@ class Model:
     return manifest
 
   def save(self, path):
-    if not path.endswith(".dpx"):
-      path += ".dpx"
+    if not path.endswith(".vpx"):
+      path += ".vpx"
 
     manifest = self._build_manifest()
     params = self.parameters()
@@ -196,19 +196,19 @@ class Model:
       manifest = json.loads(archive.read("manifest.json").decode("utf-8"))
       params = self.parameters()
 
-      if manifest.get("format") != "DeepFox":
-        raise ValueError("Invalid .dpx file format.")
+      if manifest.get("format") != "Vulpex":
+        raise ValueError("Invalid .vpx file format.")
 
       saved_blocks = manifest.get("blocks", [])
       current_blocks = [block.get_config() for block in self.blocks]
 
       if saved_blocks != current_blocks:
-        raise ValueError("Model architecture does not match the .dpx file.")
+        raise ValueError("Model architecture does not match the .vpx file.")
 
       saved_params = manifest.get("parameters", [])
 
       if len(saved_params) != len(params):
-        raise ValueError("Parameter count does not match the .dpx file.")
+        raise ValueError("Parameter count does not match the .vpx file.")
 
       for i, p in enumerate(params):
         with archive.open(f"param_{i}.npy") as f:

@@ -1,22 +1,22 @@
-# DeepFox
+# Vulpex
 
 A lightweight deep learning framework built on NumPy. As low-level as PyTorch or as high-level as scikit-learn — your choice.
 
 ## Quick Start
 
-Install DeepFox and build your first model in minutes.
+Install Vulpex and build your first model in minutes.
 
 ```python
 import numpy as np
-import deepfox as dfx
+import vulpex as vpx
 
 # Create a simple classifier
-model = dfx.Model(
-  dfx.Sequential(
-    dfx.Linear(784, 128),
-    dfx.ReLU(),
-    dfx.Linear(128, 10),
-    dfx.Softmax()
+model = vpx.Model(
+  vpx.Sequential(
+    vpx.Linear(784, 128),
+    vpx.ReLU(),
+    vpx.Linear(128, 10),
+    vpx.Softmax()
   )
 )
 
@@ -29,8 +29,8 @@ history = model.fit(
   X_train, y_train,
   epochs=20,
   batch_size=32,
-  optimizer=dfx.Adam(lr=0.001),
-  loss=dfx.CrossEntropy()
+  optimizer=vpx.Adam(lr=0.001),
+  loss=vpx.CrossEntropy()
 )
 
 # Predict
@@ -44,10 +44,10 @@ predictions = model.predict(X_train[:5])
 For when you want simplicity:
 
 ```python
-model = dfx.Model(
-  dfx.Sequential(
-    dfx.Linear(4, 16), dfx.ReLU(),
-    dfx.Linear(16, 3), dfx.Softmax()
+model = vpx.Model(
+  vpx.Sequential(
+    vpx.Linear(4, 16), vpx.ReLU(),
+    vpx.Linear(16, 3), vpx.Softmax()
   )
 )
 
@@ -55,11 +55,11 @@ history = model.fit(
   X_train, y_train,
   epochs=50,
   batch_size=32,
-  optimizer=dfx.Adam(lr=0.001),
-  loss=dfx.CrossEntropy(),
+  optimizer=vpx.Adam(lr=0.001),
+  loss=vpx.CrossEntropy(),
   validation_data=(X_val, y_val),
-  scheduler=dfx.ReduceOnPlateau(optimizer, patience=5),
-  early_stopping=dfx.EarlyStopping(patience=10)
+  scheduler=vpx.ReduceOnPlateau(optimizer, patience=5),
+  early_stopping=vpx.EarlyStopping(patience=10)
 )
 ```
 
@@ -68,16 +68,16 @@ history = model.fit(
 For when you want full control:
 
 ```python
-model = dfx.Model(
-  dfx.Sequential(
-    dfx.Linear(4, 16), dfx.ReLU(),
-    dfx.Linear(16, 3), dfx.Softmax()
+model = vpx.Model(
+  vpx.Sequential(
+    vpx.Linear(4, 16), vpx.ReLU(),
+    vpx.Linear(16, 3), vpx.Softmax()
   )
 )
 
-optimizer = dfx.Adam(lr=0.001)
-loss_fn = dfx.CrossEntropy()
-loader = dfx.DataLoader(X_train, y_train, batch_size=32, shuffle=True)
+optimizer = vpx.Adam(lr=0.001)
+loss_fn = vpx.CrossEntropy()
+loader = vpx.DataLoader(X_train, y_train, batch_size=32, shuffle=True)
 
 for epoch in range(50):
   for X_batch, y_batch in loader:
@@ -92,24 +92,24 @@ for epoch in range(50):
 ## CNN Example
 
 ```python
-model = dfx.Model(
-  dfx.Sequential(
-    dfx.Conv2D(1, 16, kernel_size=3, padding=1),
-    dfx.BatchNorm2D(16),
-    dfx.ReLU(),
-    dfx.MaxPool2D(2),
+model = vpx.Model(
+  vpx.Sequential(
+    vpx.Conv2D(1, 16, kernel_size=3, padding=1),
+    vpx.BatchNorm2D(16),
+    vpx.ReLU(),
+    vpx.MaxPool2D(2),
 
-    dfx.Conv2D(16, 32, kernel_size=3, padding=1),
-    dfx.BatchNorm2D(32),
-    dfx.ReLU(),
-    dfx.MaxPool2D(2),
+    vpx.Conv2D(16, 32, kernel_size=3, padding=1),
+    vpx.BatchNorm2D(32),
+    vpx.ReLU(),
+    vpx.MaxPool2D(2),
 
-    dfx.Flatten(),
-    dfx.Linear(32 * 7 * 7, 128),
-    dfx.ReLU(),
-    dfx.Dropout(0.5),
-    dfx.Linear(128, 10),
-    dfx.Softmax()
+    vpx.Flatten(),
+    vpx.Linear(32 * 7 * 7, 128),
+    vpx.ReLU(),
+    vpx.Dropout(0.5),
+    vpx.Linear(128, 10),
+    vpx.Softmax()
   )
 )
 
@@ -154,8 +154,8 @@ model.summary((784,))
 model.count_params()
 
 # Save and load
-model.save("my_model.dpx")
-model.load("my_model.dpx")
+model.save("my_model.vpx")
+model.load("my_model.vpx")
 
 # Train and evaluate
 history = model.fit(X_train, y_train, epochs=20, batch_size=32, optimizer=optimizer, loss=loss_fn)
@@ -167,30 +167,30 @@ preds = model.predict(X_test)
 
 ```python
 # Split with optional validation set and stratified splitting
-X_train, X_test, y_train, y_test = dfx.train_test_val_split(X, y, test_size=0.2, seed=42)
+X_train, X_test, y_train, y_test = vpx.train_test_val_split(X, y, test_size=0.2, seed=42)
 
-X_train, X_test, X_val, y_train, y_test, y_val = dfx.train_test_val_split(
+X_train, X_test, X_val, y_train, y_test, y_val = vpx.train_test_val_split(
   X, y, test_size=0.2, val_size=0.1, stratify=True, seed=42
 )
 
 # DataLoader for batching and shuffling
-loader = dfx.DataLoader(X_train, y_train, batch_size=32, shuffle=True, drop_last=True, seed=42)
+loader = vpx.DataLoader(X_train, y_train, batch_size=32, shuffle=True, drop_last=True, seed=42)
 ```
 
 ## Training with Callbacks
 
 ```python
-optimizer = dfx.Adam(lr=0.01)
+optimizer = vpx.Adam(lr=0.01)
 
 history = model.fit(
   X_train, y_train,
   epochs=100,
   batch_size=32,
   optimizer=optimizer,
-  loss=dfx.CrossEntropy(),
+  loss=vpx.CrossEntropy(),
   validation_data=(X_val, y_val),
-  scheduler=dfx.StepLR(optimizer, step_size=20, gamma=0.1),
-  early_stopping=dfx.EarlyStopping(patience=10, min_delta=0.001)
+  scheduler=vpx.StepLR(optimizer, step_size=20, gamma=0.1),
+  early_stopping=vpx.EarlyStopping(patience=10, min_delta=0.001)
 )
 
 # Access training history
@@ -208,9 +208,9 @@ for X_batch, y_batch in loader:
   grad = loss_fn.backward()
   model.backward(grad)
 
-  dfx.clip_grad_norm(model.parameters(), max_norm=1.0)
+  vpx.clip_grad_norm(model.parameters(), max_norm=1.0)
   # or
-  dfx.clip_grad_value(model.parameters(), clip_value=0.5)
+  vpx.clip_grad_value(model.parameters(), clip_value=0.5)
 
   optimizer.step(model.parameters())
 ```
@@ -218,8 +218,8 @@ for X_batch, y_batch in loader:
 ## Custom Weight Initialization
 
 ```python
-layer = dfx.Linear(784, 256)
-layer.weights.data = dfx.xavier_uniform((784, 256))
+layer = vpx.Linear(784, 256)
+layer.weights.data = vpx.xavier_uniform((784, 256))
 ```
 
 ## Requirements
