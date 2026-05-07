@@ -1,6 +1,6 @@
 # Vulpex
 
-A lightweight deep learning framework built on NumPy. Low-level or high-level — your choice.
+A lightweight deep learning framework built on NumPy. Low-level customizability and high-level usability in one.
 
 ## Quick Start
 
