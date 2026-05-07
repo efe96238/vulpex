@@ -419,7 +419,7 @@ class CosineEmbeddingLoss:
     if x1.ndim != 2:
       raise ValueError(f"CosineEmbeddingLoss expects 2D inputs (batch_size, features), got {x1.ndim}D.")
 
-    self.y = y
+    self.y = y.reshape(-1, 1)
     self.x1 = x1
     self.x2 = x2
 

@@ -28,6 +28,7 @@ class Embedding(Layer):
     dweights = np.zeros_like(self.weights.data)
     np.add.at(dweights, self.x, grad)
     self.weights.grad = dweights
+    return None
 
   def parameters(self):
     return [self.weights]

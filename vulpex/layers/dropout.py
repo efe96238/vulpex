@@ -22,6 +22,8 @@ class Dropout(Layer):
       return x
   
   def backward(self, grad):
+    if not self.training:
+      return grad
     return grad * self.mask / (1 - self.p)
   
   def parameters(self):

@@ -7,6 +7,7 @@ def _to_labels(y):
     return argmax(y, axis=1)
   if y.ndim == 1:
     return y
+  raise ValueError(f"Expected 1D or 2D input, got {y.ndim}D.")
   
 def _confusion_counts(y_true, y_pred):
   classes = np.unique(np.concatenate([y_true, y_pred]))
