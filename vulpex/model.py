@@ -131,22 +131,28 @@ class Model:
   def count_params(self):
     return sum(p.data.size for p in self.parameters())
   
-  def summary(self, input_shape):
-    x = np.zeros((1,) + input_shape)
-    
+  def summary(self, input_shape=None):
+    name_counts = dict()
     rows = []
+
+    if input_shape is not None:
+      x = np.zeros((1,) + input_shape)
+
     for layer in self._get_all_layers():
-      x = layer.forward(x)
+      if input_shape is not None:
+        x = layer.forward(x)
       name = layer.__class__.__name__
-      shape = x.shape
+      name_counts[name] = name_counts.get(name, 0) + 1
+      display_name = f"{name}_{name_counts[name]}"
+      shape = str(x.shape) if input_shape is not None else "-"
       params = sum(p.data.size for p in layer.parameters())
-      rows.append((name, shape, params))
-    
-    print(f"{'Layer':<25}{'Output Shape':<25}{'Params':<10}")
-    print("─" * 60)
-    for name, shape, params in rows:
-      print(f"{name:<25}{str(shape):<25}{params:<10}")
-    print("═" * 60)
+      rows.append((display_name, shape, params))
+
+    print(f"{'Layer':<30}{'Output Shape':<30}{'Params':<10}")
+    print("─" * 65)
+    for display_name, shape, params in rows:
+      print(f"{display_name:<30}{str(shape):<30}{params:<10}")
+    print("═" * 65)
     print(f"Total params: {self.count_params():,}")
 
   def _get_all_layers(self):
