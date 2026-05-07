@@ -34,6 +34,12 @@ class MSE:
       return grad
     elif self.reduction == 'none':
       return grad
+  
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"MSE(reduction='{self.reduction}')"
 
 class MAE:
   def __init__(self, reduction='mean'):
@@ -69,6 +75,12 @@ class MAE:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"MAE(reduction='{self.reduction}')"
 
 class BCE:
   def __init__(self, reduction='mean'):
@@ -107,6 +119,12 @@ class BCE:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"BCE(reduction='{self.reduction}')"
 
 class BCEWithLogits:
   def __init__(self, reduction='mean'):
@@ -143,6 +161,12 @@ class BCEWithLogits:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"BCEWithLogits(reduction='{self.reduction}')"
 
 class CrossEntropy:
   def __init__(self, weight=None, reduction='mean'):
@@ -194,6 +218,12 @@ class CrossEntropy:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"CrossEntropy(weight={self.weight}, reduction='{self.reduction}')"
 
 class CrossEntropyWithLogits:
   def __init__(self, weight=None, reduction='mean'):
@@ -248,6 +278,12 @@ class CrossEntropyWithLogits:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"CrossEntropyWithLogits(weight={self.weight}, reduction='{self.reduction}')"
 
 class HuberLoss:
   def __init__(self, delta=1.0, reduction='mean'):
@@ -286,6 +322,12 @@ class HuberLoss:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"HuberLoss(delta={self.delta}, reduction='{self.reduction}')"
 
 class NLLLoss:
   def __init__(self, reduction='mean'):
@@ -324,6 +366,12 @@ class NLLLoss:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"NLLLoss(reduction='{self.reduction}')"
 
 class HingeLoss:
   def __init__(self, reduction='mean'):
@@ -359,6 +407,12 @@ class HingeLoss:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"HingeLoss(reduction='{self.reduction}')"
 
 class KLDivergence:
   def __init__(self, reduction='mean'):
@@ -400,6 +454,12 @@ class KLDivergence:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"KLDivergence(reduction='{self.reduction}')"
 
 class CosineEmbeddingLoss:
   def __init__(self, margin=0.0, reduction='mean'):
@@ -460,6 +520,12 @@ class CosineEmbeddingLoss:
       return dx1, dx2
     elif self.reduction == 'none':
       return dx1, dx2
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"CosineEmbeddingLoss(margin={self.margin}, reduction='{self.reduction}')"
 
 class SmoothL1Loss:
   def __init__(self, beta=1.0, reduction='mean'):
@@ -498,3 +564,9 @@ class SmoothL1Loss:
       return grad
     elif self.reduction == 'none':
       return grad
+    
+  def __call__(self, *args):
+    return self.forward(*args)
+
+  def __repr__(self):
+    return f"SmoothL1Loss(beta={self.beta}, reduction='{self.reduction}')"

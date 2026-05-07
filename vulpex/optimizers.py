@@ -28,6 +28,9 @@ class Adam:
       v_hat = self.v[i] / (1 - self.beta2 ** self.t)
 
       p.data -= self.lr * m_hat / (np.sqrt(v_hat) + self.eps)
+    
+  def __repr__(self):
+    return f"Adam(lr={self.lr}, beta1={self.beta1}, beta2={self.beta2}, eps={self.eps})"
 
 class AdamW:
   def __init__(self, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8, weight_decay=0.01):
@@ -62,6 +65,9 @@ class AdamW:
 
       p.data -= adam_update + decay_update
 
+  def __repr__(self):
+    return f"AdamW(lr={self.lr}, beta1={self.beta1}, beta2={self.beta2}, eps={self.eps}, weight_decay={self.weight_decay})"
+
 class SGD:
   def __init__(self, lr=0.001):
     self.lr = lr
@@ -69,6 +75,9 @@ class SGD:
   def step(self, params):
     for p in params:
       p.data -= self.lr * p.grad
+
+  def __repr__(self):
+    return f"SGD(lr={self.lr})"
 
 class MomentumSGD:
   def __init__(self, lr=0.001, beta=0.9):
@@ -87,6 +96,9 @@ class MomentumSGD:
       self.v[i] = self.beta * self.v[i] - self.lr * g
       p.data += self.v[i]
 
+  def __repr__(self):
+    return f"MomentumSGD(lr={self.lr}, beta={self.beta})"
+
 class RMSProp:
   def __init__(self, lr=0.001, beta=0.9, eps=1e-8):
     self.lr = lr
@@ -104,3 +116,6 @@ class RMSProp:
 
       self.s[i] = self.beta * self.s[i] + (1 - self.beta) * (g * g)
       p.data -= self.lr * g / (np.sqrt(self.s[i]) + self.eps)
+
+  def __repr__(self):
+    return f"RMSProp(lr={self.lr}, beta={self.beta}, eps={self.eps})"
