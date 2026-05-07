@@ -66,7 +66,7 @@ def f1_score(y_true, y_pred, average='macro'):
   elif average == 'micro':
     micro_p = np.sum(tp) / (np.sum(tp) + np.sum(fp))
     micro_r = np.sum(tp) / (np.sum(tp) + np.sum(fn))
-    return np.where(micro_p + micro_r > 0, 2 * micro_p * micro_r / (micro_p + micro_r), 0.0)
+    return float(np.where(micro_p + micro_r > 0, 2 * micro_p * micro_r / (micro_p + micro_r), 0.0))
   elif average == 'weighted':
     support = tp + fn
     return np.sum(per_class * support) / np.sum(support)
