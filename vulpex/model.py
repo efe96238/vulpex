@@ -70,16 +70,45 @@ class Model:
     preds = self.predict(X, batch_size)
     return loss.forward(y, preds)
   
-  def fit(self, X, y, epochs=10, batch_size=32, optimizer=None, loss=None, validation_data=None, scheduler=None, early_stopping=None, verbose=True):
+  def fit(self, X, y, epochs=10, batch_size=32, optimizer=None, loss=None, validation_data=None, scheduler=None, early_stopping=None, metrics=None, verbose=True):
     if optimizer is None:
       raise ValueError("optimizer cannot be None.")
     if loss is None:
       raise ValueError("loss cannot be None.")
 
+    X = np.asarray(X)
+    y = np.asarray(y)
+
+    if X.shape[0] != y.shape[0]:
+      raise ValueError(f"X and y must have the same number of samples. Got X: {X.shape[0]}, y: {y.shape[0]}.")
+
+    if not isinstance(epochs, int) or epochs < 1:
+      raise ValueError(f"epochs must be a positive integer, got {epochs}.")
+
+    if batch_size is not None:
+      if not isinstance(batch_size, int) or batch_size < 1:
+        raise ValueError(f"batch_size must be a positive integer or None, got {batch_size}.")
+
+    if metrics is not None:
+      if not isinstance(metrics, (list, tuple)):
+        raise ValueError("metrics must be a list of metric names (e.g., ['accuracy']).")
+      for m in metrics:
+        if m not in ('accuracy',):
+          raise ValueError(f"Unknown metric '{m}'. Supported metrics: 'accuracy'.")
+
+    if validation_data is not None:
+      if not isinstance(validation_data, (tuple, list)) or len(validation_data) != 2:
+        raise ValueError("validation_data must be a tuple of (X_val, y_val).")
+      X_val, y_val = np.asarray(validation_data[0]), np.asarray(validation_data[1])
+      if X_val.shape[0] != y_val.shape[0]:
+        raise ValueError(f"Validation X and y must have the same number of samples. Got X_val: {X_val.shape[0]}, y_val: {y_val.shape[0]}.")
+      validation_data = (X_val, y_val)
+
+    track_accuracy = metrics is not None and 'accuracy' in metrics
+
     if batch_size is not None:
       loader = DataLoader(X, y, batch_size=batch_size, shuffle=True)
     else:
-      X, y = np.asarray(X), np.asarray(y)
       loader = [(X, y)]
     history = History()
 
@@ -87,6 +116,8 @@ class Model:
       start = time.time()
       self.train()
       batch_losses = []
+      correct = 0
+      total = 0
 
       for X_batch, y_batch in loader:
         self.zero_grad()
@@ -97,13 +128,36 @@ class Model:
         optimizer.step(self.parameters())
         batch_losses.append(batch_loss)
 
+        if track_accuracy:
+          pred_labels = np.argmax(pred, axis=1)
+          if y_batch.ndim == 2:
+            true_labels = np.argmax(y_batch, axis=1)
+          else:
+            true_labels = y_batch
+          correct += np.sum(pred_labels == true_labels)
+          total += len(y_batch)
+
       epoch_loss = np.mean(batch_losses)
       history.record("loss", float(epoch_loss))
+
+      if track_accuracy:
+        epoch_acc = correct / total
+        history.record("accuracy", float(epoch_acc))
 
       if validation_data is not None:
         X_val, y_val = validation_data
         val_loss = self.evaluate(X_val, y_val, loss)
         history.record("val_loss", float(val_loss))
+
+        if track_accuracy:
+          val_pred = self.predict(X_val)
+          val_pred_labels = np.argmax(val_pred, axis=1)
+          if y_val.ndim == 2:
+            val_true_labels = np.argmax(y_val, axis=1)
+          else:
+            val_true_labels = y_val
+          val_acc = np.sum(val_pred_labels == val_true_labels) / len(y_val)
+          history.record("val_accuracy", float(val_acc))
 
       if scheduler is not None:
         scheduler.step(epoch_loss)
@@ -120,10 +174,14 @@ class Model:
       elapsed = time.time() - start
 
       if verbose:
-        msg = f"Epoch {epoch + 1}/{epochs} | Training Loss: {epoch_loss:.4f}"
+        msg = f"Epoch {epoch + 1}/{epochs} | Loss: {epoch_loss:.4f}"
+        if track_accuracy:
+          msg += f" | Acc: {epoch_acc:.4f}"
         if validation_data is not None:
-          msg += f" | Validation Loss: {val_loss:.4f}"
-        msg += f" | Duration: {elapsed:.2f}s"
+          msg += f" | Val Loss: {val_loss:.4f}"
+          if track_accuracy:
+            msg += f" | Val Acc: {val_acc:.4f}"
+        msg += f" | {elapsed:.2f}s"
         print(msg)
 
     return history
