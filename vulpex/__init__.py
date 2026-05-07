@@ -29,6 +29,8 @@ from .parameter import Parameter
 
 from .utils import argmax, seed, train_test_val_split, clip_grad_norm, clip_grad_value
 
+from .metrics import accuracy, precision, recall, f1_score
+
 from .dataloader import DataLoader
 
 from .history import History
@@ -56,6 +58,7 @@ __all__ = [
   "Adam", "AdamW", "SGD", "MomentumSGD", "RMSProp",
   "Parameter",
   "argmax", "seed", "train_test_val_split", "clip_grad_norm", "clip_grad_value",
+  "accuracy", "precision", "recall", "f1_score",
   "DataLoader", "History", "StepLR", "ReduceOnPlateau", "EarlyStopping",
   "xavier_uniform", "xavier_normal", "he_uniform", "he_normal", "zeros", "ones"
 ]

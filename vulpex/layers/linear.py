@@ -36,7 +36,7 @@ class Linear(Layer):
   def backward(self, grad):
     grad = np.asarray(grad)
 
-    self.weights.grad = self.x.T @ grad
+    self.weights.grad = self.x.reshape(-1, self.in_features).T @ grad.reshape(-1, self.out_features)
     if self.bias is not None:
       self.bias.grad = np.sum(grad, axis=0, keepdims=True)
 

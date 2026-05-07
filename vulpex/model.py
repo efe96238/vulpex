@@ -214,13 +214,18 @@ class Model:
     print(f"Total params: {self.count_params():,}")
 
   def _get_all_layers(self):
-      layers = []
-      for block in self.blocks:
-        if hasattr(block, 'layers'):
-          layers.extend(block.layers)
-        else:
-          layers.append(block)
-      return layers
+    def _flatten(block):
+      if hasattr(block, 'layers'):
+        result = []
+        for layer in block.layers:
+          result.extend(_flatten(layer))
+        return result
+      return [block]
+
+    layers = []
+    for block in self.blocks:
+      layers.extend(_flatten(block))
+    return layers
 
   def _build_manifest(self):
     params = self.parameters()
