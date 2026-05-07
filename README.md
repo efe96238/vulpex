@@ -229,4 +229,4 @@ layer.weights.data = vpx.xavier_uniform((784, 256))
 
 ## License
 
-MIT
+BSD-3-Clause
