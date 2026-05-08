@@ -6,3 +6,4 @@ pyproject.toml
 *.egg-info/
 testscripts/
 testsets/
+dist/

@@ -39,7 +39,7 @@ predictions = model.predict(X_train[:5])
 
 ## Two Ways to Train
 
-### High-Level (sklearn-style)
+### High-Level usage
 
 For when you want simplicity:
 
@@ -63,7 +63,7 @@ history = model.fit(
 )
 ```
 
-### Low-Level (PyTorch-style)
+### Low-Level usage
 
 For when you want full control:
 
