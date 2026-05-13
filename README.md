@@ -6,6 +6,10 @@ A lightweight deep learning framework built on NumPy. Low-level customizability 
 
 Install Vulpex and build your first model in minutes.
 
+```bash
+pip install vulpex
+```
+
 ```python
 import numpy as np
 import vulpex as vpx
