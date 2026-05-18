@@ -1,4 +1,5 @@
 import numpy as np
+from .utils import get_rng
 
 class DataLoader:
   def __init__(self, X, y=None, batch_size=32, shuffle=True, drop_last=False, seed=None):
@@ -8,7 +9,7 @@ class DataLoader:
     self.shuffle = shuffle
     self.drop_last = drop_last
     self.seed = seed
-    self.rng = np.random.default_rng(seed)
+    self.rng = np.random.default_rng(seed) if seed is not None else get_rng()
 
     if not isinstance(batch_size, int) or batch_size < 1:
       raise ValueError(f"batch_size must be a positive integer, got {batch_size}.")
