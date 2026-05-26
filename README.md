@@ -2,6 +2,9 @@
 
 A lightweight deep learning framework built on NumPy. Low-level customizability and high-level usability in one.
 
+## Documentation Website
+www.vulpex.org
+
 ## Quick Start
 
 Install Vulpex and build your first model in minutes.
