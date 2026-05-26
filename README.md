@@ -4,7 +4,7 @@ A lightweight deep learning framework built on NumPy. Low-level customizability 
 
 ## Documentation Website
 
-vulpex.org
+www.vulpex.org
 
 ## Quick Start
 
