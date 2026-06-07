@@ -3,6 +3,36 @@ from .base import Layer
 from ..parameter import Parameter
 from ..utils import get_rng
 
+def im2col_1d(x, kernel_size, stride):
+  batch, in_channels, length = x.shape
+  out_len = (length - kernel_size) // stride + 1
+
+  starts = np.arange(out_len) * stride
+  offsets = np.arange(kernel_size)
+  indices = starts[:, None] + offsets[None, :]
+
+  cols = x[:, :, indices]
+  cols = cols.transpose(0, 2, 1, 3).reshape(batch, out_len, -1)
+
+  return cols
+
+def col2im_1d(cols, x_shape, kernel_size, stride):
+  batch, in_channels, length = x_shape
+  out_len = (length - kernel_size) // stride + 1
+
+  dx = np.zeros((batch, in_channels, length))
+
+  cols = cols.reshape(batch, out_len, in_channels, kernel_size)
+  cols = cols.transpose(0, 2, 1, 3)
+
+  starts = np.arange(out_len) * stride
+  offsets = np.arange(kernel_size)
+  indices = starts[:, None] + offsets[None, :]
+
+  np.add.at(dx, (slice(None), slice(None), indices), cols)
+
+  return dx
+
 class Conv1D(Layer):
   def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, bias=True):
     self.in_channels = in_channels
@@ -46,58 +76,39 @@ class Conv1D(Layer):
 
     self.x_padded = x_padded
 
-    out_len = (input_len - self.kernel_size + 2 * self.padding) // self.stride + 1
+    self.cols = im2col_1d(x_padded, self.kernel_size, self.stride)
 
-    out = np.zeros((batch_size, self.out_channels, out_len))
+    W = self.weights.data.reshape(self.out_channels, -1).T
 
-    for b in range(batch_size):
-      for oc in range(self.out_channels):
-        for i in range(out_len):
-          start = i * self.stride
-          end = start + self.kernel_size
+    out = self.cols @ W
 
-          window = x_padded[b, :, start:end]
+    if self.bias is not None:
+      out += self.bias.data
 
-          kernel = self.weights.data[oc]
-          value = np.sum(window * kernel)
-          if self.bias is not None:
-            value += self.bias.data[0, oc]
-
-          out[b, oc, i] = value
+    out = out.transpose(0, 2, 1)
 
     return out
 
   def backward(self, grad):
     grad = np.asarray(grad)
 
-    batch_size, _, out_len = grad.shape
+    grad_t = grad.transpose(0, 2, 1)
 
-    dweights = np.zeros_like(self.weights.data)
+    batch, out_len, _ = grad_t.shape
+    cols_flat = self.cols.reshape(batch * out_len, -1)
+    grad_flat = grad_t.reshape(batch * out_len, -1)
+    dW = cols_flat.T @ grad_flat
+    self.weights.grad = dW.T.reshape(self.weights.data.shape)
+
     if self.bias is not None:
-      dbias = np.zeros_like(self.bias.data)
-    dx_padded = np.zeros_like(self.x_padded)
+      self.bias.grad = np.sum(grad_t, axis=(0, 1), keepdims=False)
 
-    for b in range(batch_size):
-      for oc in range(self.out_channels):
-        for i in range(out_len):
-          start = i * self.stride
-          end = start + self.kernel_size
-
-          window = self.x_padded[b, :, start:end]
-
-          dweights[oc] += grad[b, oc, i] * window
-          if self.bias is not None:
-            dbias[0, oc] += grad[b, oc, i]
-          dx_padded[b, :, start:end] += grad[b, oc, i] * self.weights.data[oc]
+    W = self.weights.data.reshape(self.out_channels, -1).T
+    dcols = grad_t @ W.T
+    dx = col2im_1d(dcols, self.x_padded.shape, self.kernel_size, self.stride)
 
     if self.padding > 0:
-      dx = dx_padded[:, :, self.padding:-self.padding]
-    else:
-      dx = dx_padded
-
-    self.weights.grad = dweights
-    if self.bias is not None:
-      self.bias.grad = dbias
+      dx = dx[:, :, self.padding:-self.padding]
 
     return dx
 
