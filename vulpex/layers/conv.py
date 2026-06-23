@@ -276,6 +276,65 @@ class Conv2D(Layer):
   def __repr__(self):
     return f"{self.__class__.__name__}(in_channels={self.in_channels}, out_channels={self.out_channels}, kernel_size={self.kernel_size}, stride={self.stride}, padding={self.padding}, bias={self.bias is not None})"
 
+def im2col_3d(x, kernel_size, stride):
+  batch, in_channels, depth, height, width = x.shape
+  out_depth = (depth - kernel_size) // stride + 1
+  out_height = (height - kernel_size) // stride + 1
+  out_width = (width - kernel_size) // stride + 1
+
+  d_starts = np.arange(out_depth) * stride
+  d_offsets = np.arange(kernel_size)
+  d_indices = d_starts[:, None] + d_offsets[None, :]
+
+  h_starts = np.arange(out_height) * stride
+  h_offsets = np.arange(kernel_size)
+  h_indices = h_starts[:, None] + h_offsets[None, :]
+
+  w_starts = np.arange(out_width) * stride
+  w_offsets = np.arange(kernel_size)
+  w_indices = w_starts[:, None] + w_offsets[None, :]
+
+  cols = x[:, :,
+    d_indices[:, :, None, None, None, None],
+    h_indices[None, None, :, :, None, None],
+    w_indices[None, None, None, None, :, :]]
+
+  cols = cols.transpose(0, 2, 4, 6, 1, 3, 5, 7)
+  cols = cols.reshape(batch, out_depth * out_height * out_width, -1)
+
+  return cols
+
+def col2im_3d(cols, x_shape, kernel_size, stride):
+  batch, in_channels, depth, height, width = x_shape
+  out_depth = (depth - kernel_size) // stride + 1
+  out_height = (height - kernel_size) // stride + 1
+  out_width = (width - kernel_size) // stride + 1
+
+  dx = np.zeros((batch, in_channels, depth, height, width))
+
+  cols = cols.reshape(batch, out_depth, out_height, out_width, in_channels, kernel_size, kernel_size, kernel_size)
+
+  cols = cols.transpose(0, 4, 1, 5, 2, 6, 3, 7)
+
+  d_starts = np.arange(out_depth) * stride
+  d_offsets = np.arange(kernel_size)
+  d_indices = d_starts[:, None] + d_offsets[None, :]
+
+  h_starts = np.arange(out_height) * stride
+  h_offsets = np.arange(kernel_size)
+  h_indices = h_starts[:, None] + h_offsets[None, :]
+
+  w_starts = np.arange(out_width) * stride
+  w_offsets = np.arange(kernel_size)
+  w_indices = w_starts[:, None] + w_offsets[None, :]
+
+  np.add.at(dx, (slice(None), slice(None),
+    d_indices[:, :, None, None, None, None],
+    h_indices[None, None, :, :, None, None],
+    w_indices[None, None, None, None, :, :]), cols)
+
+  return dx
+
 class Conv3D(Layer):
   def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, bias=True):
     self.in_channels = in_channels
@@ -321,76 +380,44 @@ class Conv3D(Layer):
 
     self.x_padded = x_padded
 
-    out_depth = (depth - self.kernel_size + 2 * self.padding) // self.stride + 1
-    out_height = (height - self.kernel_size + 2 * self.padding) // self.stride + 1
-    out_width = (width - self.kernel_size + 2 * self.padding) // self.stride + 1
+    out_depth = (depth + 2 * self.padding - self.kernel_size) // self.stride + 1
+    out_height = (height + 2 * self.padding - self.kernel_size) // self.stride + 1
+    out_width = (width + 2 * self.padding - self.kernel_size) // self.stride + 1
 
-    out = np.zeros((batch_size, self.out_channels, out_depth, out_height, out_width))
+    self.cols = im2col_3d(x_padded, self.kernel_size, self.stride)
 
-    for b in range(batch_size):
-      for oc in range(self.out_channels):
-        for d in range(out_depth):
-          for i in range(out_height):
-            for j in range(out_width):
-              h_start = i * self.stride
-              h_end = h_start + self.kernel_size
+    W = self.weights.data.reshape(self.out_channels, -1).T
 
-              w_start = j * self.stride
-              w_end = w_start + self.kernel_size
+    out = self.cols @ W
 
-              d_start = d * self.stride
-              d_end = d_start + self.kernel_size
+    if self.bias is not None:
+      out += self.bias.data
 
-              window = x_padded[b, :, d_start:d_end, h_start:h_end, w_start:w_end]
-
-              kernel = self.weights.data[oc]
-              value = np.sum(window * kernel)
-              if self.bias is not None:
-                value += self.bias.data[0, oc]
-
-              out[b, oc, d, i, j] = value
+    out = out.transpose(0, 2, 1).reshape(batch_size, self.out_channels, out_depth, out_height, out_width)
 
     return out
 
   def backward(self, grad):
     grad = np.asarray(grad)
 
-    batch_size, _, out_depth, out_height, out_width = grad.shape
+    batch_size = grad.shape[0]
 
-    dweights = np.zeros_like(self.weights.data)
+    grad_t = grad.reshape(batch_size, self.out_channels, -1).transpose(0, 2, 1)
+
+    cols_flat = self.cols.reshape(-1, self.cols.shape[-1])
+    grad_flat = grad_t.reshape(-1, self.out_channels)
+    dW = cols_flat.T @ grad_flat
+    self.weights.grad = dW.T.reshape(self.weights.data.shape)
+
     if self.bias is not None:
-      dbias = np.zeros_like(self.bias.data)
-    dx_padded = np.zeros_like(self.x_padded)
+      self.bias.grad = np.sum(grad_t, axis=(0, 1), keepdims=False).reshape(1, -1)
 
-    for b in range(batch_size):
-      for oc in range(self.out_channels):
-        for d in range(out_depth):
-          for i in range(out_height):
-            for j in range(out_width):
-              h_start = i * self.stride
-              h_end = h_start + self.kernel_size
-
-              w_start = j * self.stride
-              w_end = w_start + self.kernel_size
-
-              d_start = d * self.stride
-              d_end = d_start + self.kernel_size
-
-              window = self.x_padded[b, :, d_start:d_end, h_start:h_end, w_start:w_end]
-
-              dweights[oc] += grad[b, oc, d, i, j] * window
-              if self.bias is not None:
-                dbias[0, oc] += grad[b, oc, d, i, j]
-              dx_padded[b, :, d_start:d_end, h_start:h_end, w_start:w_end] += grad[b, oc, d, i, j] * self.weights.data[oc]
+    W = self.weights.data.reshape(self.out_channels, -1).T
+    dcols = grad_t @ W.T
+    dx = col2im_3d(dcols, self.x_padded.shape, self.kernel_size, self.stride)
 
     if self.padding > 0:
-      dx = dx_padded[:, :, self.padding:-self.padding, self.padding:-self.padding, self.padding:-self.padding]
-    else:
-      dx = dx_padded
-
-    self.weights.grad = dweights
-    if self.bias is not None:
-      self.bias.grad = dbias
+      dx = dx[:, :, self.padding:-self.padding, self.padding:-self.padding, self.padding:-self.padding]
 
     return dx
 
